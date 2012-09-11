@@ -8,6 +8,14 @@ What's this?
 Android application base library project.
 This project includes some useful class.
 
+How to use
+----
+
+1. Clone or download this project.
+2. Get ActionBarSherlock (http://actionbarsherlock.com/).
+3. Import these two projects into Eclipse.
+4. Use this project from your application project.
+
 LICENSE
 ----
 
