@@ -1,0 +1,16 @@
+=========================================================================
+==  NOTICE file for use with the Apache License, Version 2.0,          ==
+==  in this case for the AppBase distribution.                         ==
+=========================================================================
+
+AppBase
+Copyright 2012 Nishibayashi Takuji
+
+This product includes software developed by
+Nishibayashi Takuji (https://github.com/takuji31)
+
+This product includes alse software developed by:
+
+- Cristian Castiblanco (https://github.com/casidiablo)
+  - SimpleCursorLoader.java
+  - Apache License Version 2.0
