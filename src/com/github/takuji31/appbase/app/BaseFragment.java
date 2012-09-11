@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.github.takuji31.appbase;
+package com.github.takuji31.appbase.app;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
