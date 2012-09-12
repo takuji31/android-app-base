@@ -6,7 +6,7 @@ public class BaseActivity<AppClass extends BaseApp> extends
 		SherlockFragmentActivity {
 
 	@SuppressWarnings("unchecked")
-	public AppClass app() {
+	public AppClass getMyApp() {
 		return (AppClass) getApplication();
 	}
 }

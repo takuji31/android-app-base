@@ -5,12 +5,12 @@ import com.actionbarsherlock.app.SherlockDialogFragment;
 public class BaseDialogFragment<AppClass extends BaseApp, ActivityClass extends BaseActivity<AppClass>>
 		extends SherlockDialogFragment {
 
-	public AppClass app() {
-		return activity().app();
+	public AppClass getMyApp() {
+		return getMyActivity().getMyApp();
 	}
 
 	@SuppressWarnings("unchecked")
-	public ActivityClass activity() {
+	public ActivityClass getMyActivity() {
 		return (ActivityClass) getActivity();
 	}
 }

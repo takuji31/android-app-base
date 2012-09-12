@@ -5,12 +5,12 @@ import com.actionbarsherlock.app.SherlockListFragment;
 public class BaseListFragment<AppClass extends BaseApp, ActivityClass extends BaseActivity<AppClass>>
 		extends SherlockListFragment {
 
-	public AppClass app() {
-		return activity().app();
+	public AppClass getMyApp() {
+		return getMyActivity().getMyApp();
 	}
 
 	@SuppressWarnings("unchecked")
-	public ActivityClass activity() {
+	public ActivityClass getMyActivity() {
 		return (ActivityClass) getActivity();
 	}
 }

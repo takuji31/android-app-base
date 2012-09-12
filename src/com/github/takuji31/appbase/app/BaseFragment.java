@@ -13,11 +13,11 @@ public class BaseFragment<AppClass extends BaseApp, ActivityClass extends BaseAc
 		extends SherlockFragment {
 
 	@SuppressWarnings("unchecked")
-	public ActivityClass activity() {
+	public ActivityClass getMyActivity() {
 		return (ActivityClass) getActivity();
 	}
 
-	public AppClass app() {
-		return activity().app();
+	public AppClass getMyApp() {
+		return getMyActivity().getMyApp();
 	}
 }
