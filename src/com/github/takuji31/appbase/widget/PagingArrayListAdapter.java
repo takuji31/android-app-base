@@ -7,7 +7,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.AbsListView.LayoutParams;
 
-public abstract class PagingArrayListAdapter<T> extends ArrayListAdapter<T> {
+public abstract class PagingArrayListAdapter<T> extends SimpleListAdapter<T> {
 	
 	private int mViewHeight;
 

@@ -1,6 +1,6 @@
 package com.github.takuji31.appbase.widget;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,13 +8,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-public abstract class ArrayListAdapter<T> extends BaseAdapter {
+public abstract class SimpleListAdapter<T> extends BaseAdapter {
 
 	protected LayoutInflater inflater;
-	protected ArrayList<T> mList;
+	protected List<T> mList;
 	protected Context mContext;
 	
-	public ArrayListAdapter(Context context, ArrayList<T> list) {
+	public SimpleListAdapter(Context context, List<T> list) {
 		inflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mList = list;
@@ -50,7 +50,7 @@ public abstract class ArrayListAdapter<T> extends BaseAdapter {
 		return position;
 	}
 
-	public ArrayList<T> getList() {
+	public List<T> getList() {
 		return mList;
 	}
 	
