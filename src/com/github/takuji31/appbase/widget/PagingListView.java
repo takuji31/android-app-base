@@ -173,7 +173,7 @@ public class PagingListView extends ListView implements
 							int firstVisibleItem = mPage
 									- getFirstVisiblePosition();
 							View lastView = getChildAt(firstVisibleItem);
-							if (lastView.getTop() > 0) {
+							if (lastView != null && lastView.getTop() > 0) {
 								scrollPrevPage();
 							}
 						} else {
