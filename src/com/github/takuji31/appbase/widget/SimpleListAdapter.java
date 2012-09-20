@@ -28,7 +28,7 @@ public abstract class SimpleListAdapter<T> extends BaseAdapter {
 
 	public abstract int getViewLayoutId(int position);
 
-	public abstract View createView(int position, T item, View v);
+	public abstract View createView(int position, T item, View v, View parent);
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -37,7 +37,8 @@ public abstract class SimpleListAdapter<T> extends BaseAdapter {
 			convertView = inflater.inflate(layoutId, null);
 			convertView.setId(layoutId);
 		}
-		return createView(position, getItem(position), convertView);
+		View view = createView(position, getItem(position), convertView, parent);
+		return view;
 	}
 
 	@Override
