@@ -2,8 +2,10 @@ package com.github.takuji31.appbase.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -34,17 +36,11 @@ public class PagingListView extends ListView implements
 		public void onGlobalLayout() {
 			if (mViewHeight == 0) {
 				postDelayed(new Runnable() {
-
+					
 					@Override
 					public void run() {
 						mViewHeight = getHeight();
-						ListAdapter adapter = getAdapter();
-						if (adapter != null
-								&& adapter instanceof PagingArrayListAdapter<?>) {
-							((PagingArrayListAdapter<?>) adapter).notifyDataSetChanged(mViewHeight);
-						} else {
-							setAdapter(adapter);
-						}
+						invalidateViews();
 					}
 				}, POST_DELAY_TIME);
 			}
@@ -84,7 +80,7 @@ public class PagingListView extends ListView implements
 		View firstVisibleView = getChildAt(0);
 		mPage += 1;
 		smoothScrollBy(mViewHeight - Math.abs(firstVisibleView.getTop()) - 1,
-				400);
+				mScrollDuration);
 	}
 
 	public void scrollPrevPage() {
@@ -98,7 +94,7 @@ public class PagingListView extends ListView implements
 		ViewTreeObserver observer = getViewTreeObserver();
 		observer.addOnGlobalLayoutListener(mLayoutListener);
 	}
-
+	
 	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
 	public void addOnGlobalLayoutListener(OnGlobalLayoutListener listener) {
@@ -110,14 +106,6 @@ public class PagingListView extends ListView implements
 		}
 		observer.addOnGlobalLayoutListener(listener);
 		observer.addOnGlobalLayoutListener(mLayoutListener);
-	}
-
-	@Override
-	public void setAdapter(ListAdapter adapter) {
-		if (mViewHeight != 0 && adapter instanceof PagingArrayListAdapter<?>) {
-			((PagingArrayListAdapter<?>) adapter).setViewHeight(mViewHeight);
-		}
-		super.setAdapter(adapter);
 	}
 
 	@Override

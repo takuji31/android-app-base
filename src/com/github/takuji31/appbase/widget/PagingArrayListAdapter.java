@@ -9,34 +9,24 @@ import android.widget.AbsListView.LayoutParams;
 
 public abstract class PagingArrayListAdapter<T> extends SimpleListAdapter<T> {
 	
-	private int mViewHeight;
-
 	public PagingArrayListAdapter(Context context, ArrayList<T> list) {
 		super(context, list);
 	}
 	
-	public void notifyDataSetChanged(int viewHeight) {
-		mViewHeight = viewHeight;
-		super.notifyDataSetChanged();
-	}
-	
-	public void setViewHeight(int viewHeight) {
-		mViewHeight = viewHeight;
-	}
-
 	@Override
-	public View createView(int position, T item, View v) {
+	public View createView(int position, T item, View v, View parent) {
+		int height = parent.getHeight();
 		View createdView = createNonLayoutedView(position, item, v);
-		if (mViewHeight != 0) {
+		if (height != 0) {
 			LayoutParams params = (LayoutParams) createdView.getLayoutParams();
 			if (params == null) {
-				params = new LayoutParams(LayoutParams.MATCH_PARENT, mViewHeight);
+				params = new LayoutParams(LayoutParams.MATCH_PARENT, height);
 			} else {
-				params.height = mViewHeight;
+				params.height = height;
 			}
-			createdView.setMinimumHeight(mViewHeight);
+			createdView.setMinimumHeight(height);
 		}
-		return v;
+		return createdView;
 	}
 	
 	public abstract View createNonLayoutedView(int position, T item, View v);
