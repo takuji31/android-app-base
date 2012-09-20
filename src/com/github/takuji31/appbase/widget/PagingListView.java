@@ -68,11 +68,11 @@ public class PagingListView extends ListView implements
 		mListener = listener;
 	}
 
-	public void setNowPage(int page) {
+	public void setPage(int page) {
 		mPage = page;
 	}
 
-	public int getNowPage() {
+	public int getPage() {
 		return mPage;
 	}
 
