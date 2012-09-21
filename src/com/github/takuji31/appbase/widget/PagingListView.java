@@ -2,8 +2,8 @@ package com.github.takuji31.appbase.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.os.Build;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -11,7 +11,6 @@ import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AbsListView;
 import android.widget.Adapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 public class PagingListView extends ListView implements
@@ -46,7 +45,65 @@ public class PagingListView extends ListView implements
 			}
 		}
 	};
+	
+	private Handler mHandler = new Handler();
+	
+	private Runnable mIdleTask = new Runnable() {
+		public void run() {
+			int savedPosition = getFirstVisiblePosition();
+			View firstVisibleView = getChildAt(0);
 
+			if (firstVisibleView.getHeight() / 2.0 < Math.abs(firstVisibleView
+					.getTop())) {
+				mPage = savedPosition;
+				smoothScrollBy(
+						mViewHeight
+								- Math.abs(firstVisibleView
+										.getTop() - 1),
+						mScrollDuration);
+			} else {
+				mPage = savedPosition;
+				smoothScrollBy(firstVisibleView.getTop(),
+						mScrollDuration);
+			}
+
+			if (mListener != null) {
+				mListener.onScrollFinish(mPage);
+			}
+		}
+	};
+	
+	private Runnable mFlingTask = new Runnable() {
+		public void run() {
+			int savedPosition = getFirstVisiblePosition();
+			View firstVisibleView = getChildAt(0);
+
+			Adapter adapter = getAdapter();
+			int totalPage = adapter != null ? adapter.getCount() : 0;
+			if (savedPosition < mPage) {
+				if (mPage + 1 == totalPage) {
+					int firstVisibleItem = mPage
+							- getFirstVisiblePosition();
+					View lastView = getChildAt(firstVisibleItem);
+					if (lastView != null && lastView.getTop() > 0) {
+						scrollPrevPage();
+					}
+				} else {
+					scrollPrevPage();
+				}
+			} else if (0 < savedPosition
+					|| (0 == savedPosition && 0 > firstVisibleView.getTop())) {
+				if (mPage != totalPage - 1) {
+					scrollNextPage();
+				}
+			}
+
+			if (mListener != null) {
+				mListener.onScrollStart(mPage);
+			}
+		}
+	};
+	
 	int mViewHeight;
 
 	public PagingListView(Context context) {
@@ -114,71 +171,24 @@ public class PagingListView extends ListView implements
 
 		case OnScrollListener.SCROLL_STATE_IDLE:
 			if (mFlinged) {
+				Log.d(VIEW_LOG_TAG, "IDLE_FLING");
 				mFlinged = false;
 				if (mListener != null) {
 					mListener.onScrollFinish(mPage);
 				}
 			} else {
-				postDelayed(new Runnable() {
-					public void run() {
-						int savedPosition = getFirstVisiblePosition();
-						View firstVisibleView = getChildAt(0);
-
-						if (firstVisibleView.getHeight() / 2.0 < Math.abs(firstVisibleView
-								.getTop())) {
-							mPage = savedPosition;
-							smoothScrollBy(
-									mViewHeight
-											- Math.abs(firstVisibleView
-													.getTop() - 1),
-									mScrollDuration);
-						} else {
-							mPage = savedPosition;
-							smoothScrollBy(firstVisibleView.getTop(),
-									mScrollDuration);
-						}
-
-						if (mListener != null) {
-							mListener.onScrollFinish(mPage);
-						}
-					}
-				}, POST_DELAY_TIME);
+				Log.d(VIEW_LOG_TAG, "IDLE");
+				mHandler.removeCallbacks(mIdleTask);
+				mHandler.postDelayed(mIdleTask, POST_DELAY_TIME);
 			}
 
 			break;
 
 		case OnScrollListener.SCROLL_STATE_FLING:
+			Log.d(VIEW_LOG_TAG, "STATE_FLING");
 			mFlinged = true;
-			postDelayed(new Runnable() {
-				public void run() {
-					int savedPosition = getFirstVisiblePosition();
-					View firstVisibleView = getChildAt(0);
-
-					Adapter adapter = getAdapter();
-					int totalPage = adapter != null ? adapter.getCount() : 0;
-					if (savedPosition < mPage) {
-						if (mPage + 1 == totalPage) {
-							int firstVisibleItem = mPage
-									- getFirstVisiblePosition();
-							View lastView = getChildAt(firstVisibleItem);
-							if (lastView != null && lastView.getTop() > 0) {
-								scrollPrevPage();
-							}
-						} else {
-							scrollPrevPage();
-						}
-					} else if (0 < savedPosition
-							|| (0 == savedPosition && 0 > firstVisibleView.getTop())) {
-						if (mPage != totalPage - 1) {
-							scrollNextPage();
-						}
-					}
-
-					if (mListener != null) {
-						mListener.onScrollStart(mPage);
-					}
-				}
-			}, POST_DELAY_TIME);
+			mHandler.removeCallbacks(mFlingTask);
+			mHandler.postDelayed(mFlingTask, POST_DELAY_TIME);
 
 			break;
 		}
