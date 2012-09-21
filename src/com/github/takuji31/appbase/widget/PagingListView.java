@@ -26,8 +26,7 @@ public class PagingListView extends ListView implements
 		public void onNextListLoad(int page);
 	}
 
-	private int mPage;
-	private int mScrollDuration = 400;
+	private int mScrollDuration = 200;
 	private boolean mFlinged;
 	private OnPagingListener mListener;
 	private OnGlobalLayoutListener mLayoutListener = new OnGlobalLayoutListener() {
@@ -127,14 +126,14 @@ public class PagingListView extends ListView implements
 			if (mFlinged) {
 				mFlinged = false;
 				if (mListener != null) {
-					mListener.onScrollFinish(mPage);
+					mListener.onScrollFinish(getPage());
 				}
 			} else {
 				int page = getPage();
 				setPage(page);
 
 				if (mListener != null) {
-					mListener.onScrollFinish(mPage);
+					mListener.onScrollFinish(page);
 				}
 			}
 
@@ -154,14 +153,14 @@ public class PagingListView extends ListView implements
 			int count = adapter != null ? adapter.getCount() : 0;
 			if (currentY > startY && page + 1 < count) {
 				setPage(page + 1);
-			} else if (currentY < startY && page > 0) {
+			} else if (currentY < startY && page >= 0) {
 				setPage(page);
 			} else {
-				setPage(page);
+				setPage(page + (currentY < startY ? 1 : -1));
 			}
 
 			if (mListener != null) {
-				mListener.onScrollStart(mPage);
+				mListener.onScrollStart(page);
 			}
 
 			break;
@@ -172,7 +171,7 @@ public class PagingListView extends ListView implements
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
 		if (mListener != null) {
-			mListener.onNextListLoad(mPage);
+			mListener.onNextListLoad(getPage());
 		}
 	}
 }
