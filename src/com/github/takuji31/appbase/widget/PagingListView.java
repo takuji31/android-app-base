@@ -48,39 +48,6 @@ public class PagingListView extends ListView implements
 	
 	private Handler mHandler = new Handler();
 	
-	private Runnable mIdleTask = new Runnable() {
-		public void run() {
-
-			int page = getPage();
-			setPage(page);
-
-			if (mListener != null) {
-				mListener.onScrollFinish(mPage);
-			}
-		}
-	};
-	
-	private Runnable mFlingTask = new Runnable() {
-		public void run() {
-			int currentY = getCurrentTop();
-			
-			int page = getFirstVisiblePosition();
-			Adapter adapter = getAdapter();
-			int count = adapter != null ? adapter.getCount() : 0;
-			if (currentY > startY && page + 1 < count) {
-				setPage(page + 1);
-			} else if (currentY < startY && page > 0) {
-				setPage(page - 1);
-			} else {
-				setPage(page);
-			}
-
-			if (mListener != null) {
-				mListener.onScrollStart(mPage);
-			}
-		}
-	};
-	
 	int mViewHeight;
 
 	public PagingListView(Context context) {
@@ -102,9 +69,16 @@ public class PagingListView extends ListView implements
 		mListener = listener;
 	}
 
-	public void setPage(int page) {
-		int distance = getPositionByPage(page) - getCurrentTop();
-		smoothScrollBy(distance, mScrollDuration * (Math.abs(page - getFirstVisiblePosition()) + 1));
+	public void setPage(final int page) {
+		mHandler.postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				Log.d(VIEW_LOG_TAG, "set page" + page);
+				int distance = getPositionByPage(page) - getCurrentTop();
+				smoothScrollBy(distance, mScrollDuration * (Math.abs(page - getFirstVisiblePosition()) + 1));
+			}
+		}, POST_DELAY_TIME);
 	}
 
 	private int getPositionByPage(int page) {
@@ -156,7 +130,12 @@ public class PagingListView extends ListView implements
 					mListener.onScrollFinish(mPage);
 				}
 			} else {
-				mHandler.postDelayed(mIdleTask, POST_DELAY_TIME);
+				int page = getPage();
+				setPage(page);
+
+				if (mListener != null) {
+					mListener.onScrollFinish(mPage);
+				}
 			}
 
 			break;
@@ -168,7 +147,22 @@ public class PagingListView extends ListView implements
 
 		case OnScrollListener.SCROLL_STATE_FLING:
 			mFlinged = true;
-			mHandler.postDelayed(mFlingTask, POST_DELAY_TIME);
+			int currentY = getCurrentTop();
+			
+			int page = getFirstVisiblePosition();
+			Adapter adapter = getAdapter();
+			int count = adapter != null ? adapter.getCount() : 0;
+			if (currentY > startY && page + 1 < count) {
+				setPage(page + 1);
+			} else if (currentY < startY && page > 0) {
+				setPage(page);
+			} else {
+				setPage(page);
+			}
+
+			if (mListener != null) {
+				mListener.onScrollStart(mPage);
+			}
 
 			break;
 		}
@@ -177,10 +171,6 @@ public class PagingListView extends ListView implements
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
-		View v = getChildAt(0);
-		if (v != null) {
-			Log.d(VIEW_LOG_TAG, String.valueOf(v.getTop()));
-		}
 		if (mListener != null) {
 			mListener.onNextListLoad(mPage);
 		}
