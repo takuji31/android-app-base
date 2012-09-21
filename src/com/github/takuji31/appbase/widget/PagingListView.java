@@ -50,22 +50,9 @@ public class PagingListView extends ListView implements
 	
 	private Runnable mIdleTask = new Runnable() {
 		public void run() {
-			int savedPosition = getFirstVisiblePosition();
-			View firstVisibleView = getChildAt(0);
 
-			if (firstVisibleView.getHeight() / 2.0 < Math.abs(firstVisibleView
-					.getTop())) {
-				mPage = savedPosition;
-				smoothScrollBy(
-						mViewHeight
-								- Math.abs(firstVisibleView
-										.getTop() - 1),
-						mScrollDuration);
-			} else {
-				mPage = savedPosition;
-				smoothScrollBy(firstVisibleView.getTop(),
-						mScrollDuration);
-			}
+			int page = getPage();
+			setPage(page);
 
 			if (mListener != null) {
 				mListener.onScrollFinish(mPage);
@@ -75,27 +62,17 @@ public class PagingListView extends ListView implements
 	
 	private Runnable mFlingTask = new Runnable() {
 		public void run() {
-			int savedPosition = getFirstVisiblePosition();
-			View firstVisibleView = getChildAt(0);
-
+			int currentY = getCurrentTop();
+			
+			int page = getFirstVisiblePosition();
 			Adapter adapter = getAdapter();
-			int totalPage = adapter != null ? adapter.getCount() : 0;
-			if (savedPosition < mPage) {
-				if (mPage + 1 == totalPage) {
-					int firstVisibleItem = mPage
-							- getFirstVisiblePosition();
-					View lastView = getChildAt(firstVisibleItem);
-					if (lastView != null && lastView.getTop() > 0) {
-						scrollPrevPage();
-					}
-				} else {
-					scrollPrevPage();
-				}
-			} else if (0 < savedPosition
-					|| (0 == savedPosition && 0 > firstVisibleView.getTop())) {
-				if (mPage != totalPage - 1) {
-					scrollNextPage();
-				}
+			int count = adapter != null ? adapter.getCount() : 0;
+			if (currentY > startY && page + 1 < count) {
+				setPage(page + 1);
+			} else if (currentY < startY && page > 0) {
+				setPage(page - 1);
+			} else {
+				setPage(page);
 			}
 
 			if (mListener != null) {
@@ -126,24 +103,16 @@ public class PagingListView extends ListView implements
 	}
 
 	public void setPage(int page) {
-		mPage = page;
+		int distance = getPositionByPage(page) - getCurrentTop();
+		smoothScrollBy(distance, mScrollDuration * (Math.abs(page - getFirstVisiblePosition()) + 1));
 	}
 
-	public int getPage() {
-		return mPage;
+	private int getPositionByPage(int page) {
+		return getHeight() * page;
 	}
-
-	public void scrollNextPage() {
-		View firstVisibleView = getChildAt(0);
-		mPage += 1;
-		smoothScrollBy(mViewHeight - Math.abs(firstVisibleView.getTop()) - 1,
-				mScrollDuration);
-	}
-
-	public void scrollPrevPage() {
-		View firstVisibleView = getChildAt(0);
-		mPage -= 1;
-		smoothScrollBy(firstVisibleView.getTop(), mScrollDuration);
+	
+	int getPage() {
+		return Math.round((getCurrentTop() * 1.0f) / (getHeight() * 1.0f));
 	}
 
 	private void init() {
@@ -165,29 +134,40 @@ public class PagingListView extends ListView implements
 		observer.addOnGlobalLayoutListener(mLayoutListener);
 	}
 
+	int startY;
+	int getCurrentTop() {
+		int pos = getFirstVisiblePosition();
+		int top = 0;
+		View firstView = getChildAt(0);
+		if (firstView != null) {
+			top = firstView.getTop();
+		}
+		return getHeight() * pos - top;
+		
+	}
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		switch (scrollState) {
 
 		case OnScrollListener.SCROLL_STATE_IDLE:
 			if (mFlinged) {
-				Log.d(VIEW_LOG_TAG, "IDLE_FLING");
 				mFlinged = false;
 				if (mListener != null) {
 					mListener.onScrollFinish(mPage);
 				}
 			} else {
-				Log.d(VIEW_LOG_TAG, "IDLE");
-				mHandler.removeCallbacks(mIdleTask);
 				mHandler.postDelayed(mIdleTask, POST_DELAY_TIME);
 			}
 
 			break;
+			
+		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+			startY = getCurrentTop();
+			
+			break;
 
 		case OnScrollListener.SCROLL_STATE_FLING:
-			Log.d(VIEW_LOG_TAG, "STATE_FLING");
 			mFlinged = true;
-			mHandler.removeCallbacks(mFlingTask);
 			mHandler.postDelayed(mFlingTask, POST_DELAY_TIME);
 
 			break;
@@ -197,6 +177,10 @@ public class PagingListView extends ListView implements
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
+		View v = getChildAt(0);
+		if (v != null) {
+			Log.d(VIEW_LOG_TAG, String.valueOf(v.getTop()));
+		}
 		if (mListener != null) {
 			mListener.onNextListLoad(mPage);
 		}
