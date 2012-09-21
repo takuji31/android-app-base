@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -73,7 +72,6 @@ public class PagingListView extends ListView implements
 			
 			@Override
 			public void run() {
-				Log.d(VIEW_LOG_TAG, "set page" + page);
 				int distance = getPositionByPage(page) - getCurrentTop();
 				smoothScrollBy(distance, mScrollDuration * (Math.abs(page - getFirstVisiblePosition()) + 1));
 			}
