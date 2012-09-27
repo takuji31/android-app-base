@@ -1,5 +1,7 @@
 package com.github.takuji31.appbase.widget;
 
+import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
@@ -43,6 +45,7 @@ public class PagingListView extends ListView implements
 			}
 		}
 	};
+	private ArrayList<AbsListView.OnScrollListener> mScrollListeners = new ArrayList<AbsListView.OnScrollListener>();
 	
 	private Handler mHandler = new Handler();
 	
@@ -104,7 +107,14 @@ public class PagingListView extends ListView implements
 		observer.addOnGlobalLayoutListener(listener);
 		observer.addOnGlobalLayoutListener(mLayoutListener);
 	}
+	
+	public void addOnScrollListener(AbsListView.OnScrollListener listener) {
+		mScrollListeners.add(listener);
+	}
 
+	public void removeOnScrollListener(AbsListView.OnScrollListener listener) {
+		mScrollListeners.remove(listener);
+	}
 	int startY;
 	int getCurrentTop() {
 		int pos = getFirstVisiblePosition();
@@ -163,6 +173,10 @@ public class PagingListView extends ListView implements
 
 			break;
 		}
+		
+		for (AbsListView.OnScrollListener listener : mScrollListeners) {
+			listener.onScrollStateChanged(view, scrollState);
+		}
 	}
 
 	@Override
@@ -170,6 +184,9 @@ public class PagingListView extends ListView implements
 			int visibleItemCount, int totalItemCount) {
 		if (mListener != null) {
 			mListener.onNextListLoad(getPage());
+		}
+		for (AbsListView.OnScrollListener listener : mScrollListeners) {
+			listener.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
 		}
 	}
 }
