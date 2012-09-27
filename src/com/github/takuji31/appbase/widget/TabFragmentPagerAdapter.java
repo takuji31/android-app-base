@@ -3,6 +3,7 @@ package com.github.takuji31.appbase.widget;
 import java.util.ArrayList;
 
 import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.ActionBar.Tab;
 import com.github.takuji31.appbase.app.BaseActivity;
 
@@ -33,7 +34,7 @@ public class TabFragmentPagerAdapter extends FragmentPagerAdapter implements
 		}
 	}
 
-	public TabFragmentPagerAdapter(BaseActivity<?> activity, ViewPager pager) {
+	public TabFragmentPagerAdapter(SherlockFragmentActivity activity, ViewPager pager) {
 		super(activity.getSupportFragmentManager());
 		mContext = activity;
 		mActionBar = activity.getSupportActionBar();
