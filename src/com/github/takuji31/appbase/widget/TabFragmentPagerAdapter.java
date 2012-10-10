@@ -89,11 +89,8 @@ public class TabFragmentPagerAdapter extends FragmentPagerAdapter implements
 	}
 
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		Object tag = tab.getTag();
-		for (int i = 0; i < mTabs.size(); i++) {
-			if (mTabs.get(i) == tag) {
-				mViewPager.setCurrentItem(i);
-			}
+		if (mViewPager.getCurrentItem() != tab.getPosition()) {
+			mViewPager.setCurrentItem(tab.getPosition());
 		}
 	}
 
