@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.app.ActionBar.Tab;
-import com.github.takuji31.appbase.app.BaseActivity;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
